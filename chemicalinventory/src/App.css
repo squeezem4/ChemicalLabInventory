@@ -59,6 +59,11 @@
 
 .button {
   height: 55px;
+  color: black;
+}
+.button:hover {
+  background-color: black;
+  color: white;
 }
 
 .table-container {

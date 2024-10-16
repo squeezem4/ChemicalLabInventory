@@ -57,7 +57,7 @@ const App = () => {
         />
         <Button 
           variant="contained" 
-          color="primary" 
+          color="black" 
           onClick={addItem} 
           className="button"
         >
