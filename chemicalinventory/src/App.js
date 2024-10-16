@@ -28,6 +28,11 @@ const App = () => {
     }
   };
 
+  const deleteItem = (id) => {
+    const updatedInventory = inventory.filter((item) => item.id !== id);
+    setInventory(updatedInventory);
+  };
+
   return (
     <div className="container">
       <h1 className="header">Chemical Inventory</h1>
@@ -97,6 +102,7 @@ const App = () => {
         >
           Add Item
         </Button>
+
       </div>
 
       <TableContainer component={Paper} className="table-container">
@@ -124,6 +130,7 @@ const App = () => {
                 <TableCell>{item.numcontainer}</TableCell>
                 <TableCell>{item.location}</TableCell>
                 <TableCell>{item.sds}</TableCell>
+                <button type="button" onClick={()=> deleteItem(item.id)}>Delete</button>
               </TableRow>
             ))}
           </TableBody>
