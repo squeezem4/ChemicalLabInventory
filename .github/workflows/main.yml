@@ -30,4 +30,6 @@ jobs:
       #  run: npm test -- --watchAll=false
 
       - name: Build the application
-        run: npm run build
+        run: |
+          cd chemicalinventory
+          npm run build
