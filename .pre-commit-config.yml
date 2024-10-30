@@ -1,0 +1,15 @@
+# .pre-commit-config.yml  
+repos:   
+  - repo: https://github.com/pre-commit/pre-commit-hooks     
+    rev: v4.6.0  # Replace with the latest stable version if needed     
+    hooks:       
+    - id: check-added-large-files         
+      args: ["--maxkb=500"]  # Adjust max file size (in KB) as needed.       
+    - id: detect-aws-credentials       
+    - id: detect-private-key    
+
+  - repo: https://github.com/eslint/eslint
+    rev: 9.13.0  # Replace with the latest stable version if needed     
+    hooks:       
+    - id: eslint         
+      language_version: javascript    
