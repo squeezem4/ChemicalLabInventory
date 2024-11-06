@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import "../login.css";
+import image from "../logo.jpg";
 
 const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
@@ -21,7 +23,7 @@ const Login = ({ onLoginSuccess }) => {
         return;
       }
 
-      // Trigger login success callback
+      // Trigger login success
       onLoginSuccess();
 
       // Redirect to the inventory page
@@ -42,6 +44,7 @@ const Login = ({ onLoginSuccess }) => {
 
   return (
     <div className="center-wrapper">
+      <img src = {image} alt = "Umaine logo"></img>
       <div className="login-container">
         <h2>Login</h2>
         <input
