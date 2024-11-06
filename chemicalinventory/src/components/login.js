@@ -18,7 +18,7 @@ const Login = ({ onLoginSuccess }) => {
       const user = userCredential.user;
 
       if (user  && !user.emailVerified) {
-        await sendEmailVerification(user);
+        await sendEmailVerification(user); //dont forget to delete this line after dev
         setMessage('Login failed: Email not verified');
         return;
       }
