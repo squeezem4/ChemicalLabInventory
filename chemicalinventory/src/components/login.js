@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import "../login.css";
 
 const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
@@ -21,7 +22,7 @@ const Login = ({ onLoginSuccess }) => {
         return;
       }
 
-      // Trigger login success callback
+      // Trigger login success
       onLoginSuccess();
 
       // Redirect to the inventory page

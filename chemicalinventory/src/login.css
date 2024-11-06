@@ -1,0 +1,77 @@
+/* Center the login container */
+.center-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #e0e0e0; /* Light gray background */
+    margin: 0;
+  }
+  
+  /* Styling for the login container */
+  .login-container {
+    width: 400px;
+    padding: 2rem;
+    background-color: #ffffff; /* White background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    border-radius: 8px; /* Rounded corners */
+    text-align: center;
+  }
+  
+  /* Heading style */
+  .login-container h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333; /* Darker gray for text */
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Input fields */
+  .login-container input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 4px; /* Rounded corners for inputs */
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  
+  /* Button styling */
+  .login-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4A90E2; /* Blue background color for the button */
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .login-container button:hover {
+    background-color: #357ABD; /* Darker blue on hover */
+  }
+  
+  /* Message styling */
+  .login-container p {
+    color: #d9534f; /* Red color for error messages */
+    font-size: 14px;
+    margin-top: 1rem;
+  }
+  
+  /* Create Account link styling */
+  .login-container a {
+    display: block;
+    margin-top: 1rem;
+    color: #4A90E2; /* Blue color for the link */
+    font-size: 14px;
+    text-decoration: none;
+  }
+  
+  .login-container a:hover {
+    text-decoration: underline;
+  }
+  
