@@ -1,42 +1,96 @@
+//start connecting to firebase api for database control
+
 import React, { useState } from "react";
-import { 
-  TextField, 
-  Button, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper 
+import {
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import "../App.css";
 
 const ChemicalInventory = () => {
   const [inventory, setInventory] = useState([]);
-  const [newItem, setNewItem] = useState({ 
-    name: "", quantity: "", location: "", casnumber: "", 
-    manufacturer: "", weight: "", numcontainer: "", sds: "" 
+  const [newItem, setNewItem] = useState({
+    name: "",
+    quantity: "",
+    location: "",
+    casnumber: "",
+    manufacturer: "",
+    weight: "",
+    numcontainer: "",
+    sds: "",
   });
+  const [editItem, setEditItem] = useState(null);
+  const [editIndex, setEditIndex] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewItem({ ...newItem, [name]: value });
   };
 
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditItem({ ...editItem, [name]: value });
+  };
+
+
+  //firebase addDoc fucntion needs to be added
+  //implement in try catch blockss
   const addItem = () => {
     if (newItem.name && newItem.quantity && newItem.location) {
       setInventory([...inventory, newItem]);
-      setNewItem({ 
-        name: "", quantity: "", location: "", casnumber: "", 
-        manufacturer: "", weight: "", numcontainer: "", sds: "" 
+      setNewItem({
+        name: "",
+        quantity: "",
+        location: "",
+        casnumber: "",
+        manufacturer: "",
+        weight: "",
+        numcontainer: "",
+        sds: "",
       });
     }
   };
 
+
+  //firebase deleteDoc needs to be added here
+  //implement in try catch blocks
   const deleteItem = (index) => {
     const updatedInventory = inventory.filter((_, i) => i !== index);
     setInventory(updatedInventory);
+  };
+
+  const openEditModal = (item, index) => {
+    setEditItem(item);
+    setEditIndex(index);
+    setIsEditing(true);
+  };
+
+
+  //need to add firebase updateDoc method
+  //implement in try catch blocks
+  const saveEdit = () => {
+    const updatedInventory = [...inventory];
+    updatedInventory[editIndex] = editItem;
+    setInventory(updatedInventory);
+    closeEditModal();
+  };
+
+  const closeEditModal = () => {
+    setIsEditing(false);
+    setEditItem(null);
+    setEditIndex(null);
   };
 
   return (
@@ -64,9 +118,13 @@ const ChemicalInventory = () => {
           <TableHead>
             <TableRow>
               {Object.keys(newItem).map((key) => (
-                <TableCell key={key}><strong>{key}</strong></TableCell>
+                <TableCell key={key}>
+                  <strong>{key}</strong>
+                </TableCell>
               ))}
-              <TableCell><strong>Actions</strong></TableCell>
+              <TableCell>
+                <strong>Actions</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -76,14 +134,57 @@ const ChemicalInventory = () => {
                   <TableCell key={i}>{value}</TableCell>
                 ))}
                 <TableCell>
-                  <button onClick={() => deleteItem(index)}>Delete</button>
+                  <Button
+                    variant="text"
+                    color="primary"
+                    onClick={() => openEditModal(item, index)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="text"
+                    color="secondary"
+                    onClick={() => deleteItem(index)}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <p><center>Created by Code 007</center></p>
+
+      <Dialog open={isEditing} onClose={closeEditModal}>
+        <DialogTitle>Edit Chemical</DialogTitle>
+        <DialogContent>
+          {editItem &&
+            Object.keys(editItem).map((key) => (
+              <TextField
+                key={key}
+                label={key.charAt(0).toUpperCase() + key.slice(1)}
+                name={key}
+                value={editItem[key]}
+                onChange={handleEditChange}
+                className="input"
+                fullWidth
+                margin="dense"
+              />
+            ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeEditModal} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={saveEdit} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <p>
+        <center>Created by Code 007</center>
+      </p>
     </div>
   );
 };
