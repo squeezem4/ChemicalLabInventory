@@ -1,3 +1,5 @@
+//start connecting to firebase api for database control
+
 import React, { useState } from "react";
 import {
   TextField,
@@ -42,6 +44,9 @@ const ChemicalInventory = () => {
     setEditItem({ ...editItem, [name]: value });
   };
 
+
+  //firebase addDoc fucntion needs to be added
+  //implement in try catch blockss
   const addItem = () => {
     if (newItem.name && newItem.quantity && newItem.location) {
       setInventory([...inventory, newItem]);
@@ -58,6 +63,9 @@ const ChemicalInventory = () => {
     }
   };
 
+
+  //firebase deleteDoc needs to be added here
+  //implement in try catch blocks
   const deleteItem = (index) => {
     const updatedInventory = inventory.filter((_, i) => i !== index);
     setInventory(updatedInventory);
@@ -69,6 +77,9 @@ const ChemicalInventory = () => {
     setIsEditing(true);
   };
 
+
+  //need to add firebase updateDoc method
+  //implement in try catch blocks
   const saveEdit = () => {
     const updatedInventory = [...inventory];
     updatedInventory[editIndex] = editItem;
