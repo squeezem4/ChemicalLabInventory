@@ -21,14 +21,14 @@ import "../App.css";
 const ChemicalInventory = () => {
   const [inventory, setInventory] = useState([]);
   const [newItem, setNewItem] = useState({
-    name: "",
-    quantity: "",
-    location: "",
-    casnumber: "",
-    manufacturer: "",
-    weight: "",
-    numcontainer: "",
-    sds: "",
+    Name: "",
+    Quantity: "",
+    Location: "",
+    CAS: "",
+    Manufacturer: "",
+    Weight: "",
+    NumContainer: "",
+    SDS: "",
   });
   const [editItem, setEditItem] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
