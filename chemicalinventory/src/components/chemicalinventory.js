@@ -1,6 +1,4 @@
-//start connecting to firebase api for database control
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -16,81 +14,125 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
+import { db } from "../firebaseConfig.js";
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  doc,
+  onSnapshot,
+} from "firebase/firestore";
 import "../App.css";
 
+//structure the order of the fileds for firebase
+const fieldOrder = [
+  "name",
+  "quantity",
+  "location",
+  "casnumber",
+  "manufacturer",
+  "weight",
+  "numcontainer",
+  "sds",
+];
 const ChemicalInventory = () => {
+
+  // Define default item structure
+  const defaultItem = fieldOrder.reduce((obj, key) => {
+    obj[key] = "";
+    return obj;
+  }, {});
+
   const [inventory, setInventory] = useState([]);
-  const [newItem, setNewItem] = useState({
-    name: "",
-    quantity: "",
-    location: "",
-    casnumber: "",
-    manufacturer: "",
-    weight: "",
-    numcontainer: "",
-    sds: "",
-  });
+  const [newItem, setNewItem] = useState(defaultItem);
   const [editItem, setEditItem] = useState(null);
-  const [editIndex, setEditIndex] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
+  // Real-time listener for Firestore updates such as adding and editng chemical fields
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "chemicals"), (snapshot) => {
+      const items = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        const orderedData = fieldOrder.reduce((obj, key) => {
+          obj[key] = data[key] || "";
+          return obj;
+        }, {});
+        return { id: doc.id, ...orderedData };
+      });
+      setInventory(items);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+
+  // Handles input change for the new item form by updating the state
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewItem({ ...newItem, [name]: value });
   };
 
+  // Handles input change for the edit item form by updating the state
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditItem({ ...editItem, [name]: value });
   };
 
+  // Adds a new document to the chemicals collection if all fields are filled out
+  const addItem = async () => {
+    const sanitizedItem = fieldOrder.reduce((obj, key) => {
+      obj[key] = newItem[key] || ""; // Ensure all fields are included
+      return obj;
+    }, {});
 
-  //firebase addDoc fucntion needs to be added
-  //implement in try catch blockss
-  const addItem = () => {
-    if (newItem.name && newItem.quantity && newItem.location) {
-      setInventory([...inventory, newItem]);
-      setNewItem({
-        name: "",
-        quantity: "",
-        location: "",
-        casnumber: "",
-        manufacturer: "",
-        weight: "",
-        numcontainer: "",
-        sds: "",
-      });
+    if (sanitizedItem.name && sanitizedItem.quantity && sanitizedItem.location) {
+      try {
+        await addDoc(collection(db, "chemicals"), sanitizedItem);
+        setNewItem(defaultItem);
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    } else {
+      alert("Please fill in all required fields.");
     }
   };
 
-
-  //firebase deleteDoc needs to be added here
-  //implement in try catch blocks
-  const deleteItem = (index) => {
-    const updatedInventory = inventory.filter((_, i) => i !== index);
-    setInventory(updatedInventory);
+  // Deletes a document by its ID in the chemicals collection
+  const deleteItem = async (id) => {
+    try {
+      await deleteDoc(doc(db, "chemicals", id)); // Delete document by ID
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
   };
 
-  const openEditModal = (item, index) => {
+  // Opens the edit modal and populates the form with the entry's data
+  const openEditModal = (item) => {
     setEditItem(item);
-    setEditIndex(index);
     setIsEditing(true);
   };
 
+  // Updates a document in the chemicals collection with the data from the edit form
+  const saveEdit = async () => {
+    const sanitizedEditItem = fieldOrder.reduce((obj, key) => {
+      obj[key] = editItem[key] || "";
+      return obj;
+    }, {});
 
-  //need to add firebase updateDoc method
-  //implement in try catch blocks
-  const saveEdit = () => {
-    const updatedInventory = [...inventory];
-    updatedInventory[editIndex] = editItem;
-    setInventory(updatedInventory);
-    closeEditModal();
+    try {
+      const itemRef = doc(db, "chemicals", editItem.id);
+      await updateDoc(itemRef, sanitizedEditItem);
+      closeEditModal();
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    }
   };
 
+  // Closes the edit modal
   const closeEditModal = () => {
     setIsEditing(false);
     setEditItem(null);
-    setEditIndex(null);
   };
 
   return (
@@ -98,7 +140,7 @@ const ChemicalInventory = () => {
       <h1 className="header">Chemical Inventory</h1>
 
       <div className="form-container">
-        {Object.keys(newItem).map((key) => (
+        {fieldOrder.map((key) => (
           <TextField
             key={key}
             label={key.charAt(0).toUpperCase() + key.slice(1)}
@@ -117,9 +159,9 @@ const ChemicalInventory = () => {
         <Table>
           <TableHead>
             <TableRow>
-              {Object.keys(newItem).map((key) => (
+              {fieldOrder.map((key) => (
                 <TableCell key={key}>
-                  <strong>{key}</strong>
+                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}</strong>
                 </TableCell>
               ))}
               <TableCell>
@@ -128,23 +170,23 @@ const ChemicalInventory = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {inventory.map((item, index) => (
-              <TableRow key={index}>
-                {Object.values(item).map((value, i) => (
-                  <TableCell key={i}>{value}</TableCell>
+            {inventory.map((item) => (
+              <TableRow key={item.id}>
+                {fieldOrder.map((key) => (
+                  <TableCell key={key}>{item[key]}</TableCell>
                 ))}
                 <TableCell>
                   <Button
                     variant="text"
                     color="primary"
-                    onClick={() => openEditModal(item, index)}
+                    onClick={() => openEditModal(item)}
                   >
                     Edit
                   </Button>
                   <Button
                     variant="text"
                     color="secondary"
-                    onClick={() => deleteItem(index)}
+                    onClick={() => deleteItem(item.id)}
                   >
                     Delete
                   </Button>
@@ -159,12 +201,12 @@ const ChemicalInventory = () => {
         <DialogTitle>Edit Chemical</DialogTitle>
         <DialogContent>
           {editItem &&
-            Object.keys(editItem).map((key) => (
+            fieldOrder.map((key) => (
               <TextField
                 key={key}
                 label={key.charAt(0).toUpperCase() + key.slice(1)}
                 name={key}
-                value={editItem[key]}
+                value={editItem[key] || ""}
                 onChange={handleEditChange}
                 className="input"
                 fullWidth
