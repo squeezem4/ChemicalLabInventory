@@ -25,7 +25,7 @@ import {
 } from "firebase/firestore";
 import "../App.css";
 
-//structure the order of the fileds for firebase
+//structure the order of the fields for firebase
 const fieldOrder = [
   "name",
   "quantity",
