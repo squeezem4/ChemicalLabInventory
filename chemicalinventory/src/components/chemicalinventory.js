@@ -49,7 +49,7 @@ const ChemicalInventory = () => {
   const [editItem, setEditItem] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Real-time listener for Firestore updates such as adding and editng chemical fields
+  // listener for Firestore updates such as adding and editing chemical fields
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "chemicals"), (snapshot) => {
       const items = snapshot.docs.map((doc) => {
@@ -153,6 +153,13 @@ const ChemicalInventory = () => {
         <Button variant="contained" onClick={addItem} className="button">
           Add Item
         </Button>
+        <Button
+          variant="contained"
+          href="/export-csv"
+          className="button"
+        >
+          Export
+        </Button>
       </div>
 
       <TableContainer component={Paper} className="table-container">
@@ -232,3 +239,4 @@ const ChemicalInventory = () => {
 };
 
 export default ChemicalInventory;
+

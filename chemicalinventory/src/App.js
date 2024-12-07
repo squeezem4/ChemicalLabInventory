@@ -1,36 +1,71 @@
-
-//""eslint 'src/**/*.{js,jsx}'"
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import Login from "./components/login";
 import ChemicalInventory from "./components/chemicalinventory";
+import CSVFile from "./components/csvFile";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
+  const auth = getAuth();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
+
+  const handleLogout = () => {
+    signOut(auth).then(() => {
+      setIsLoggedIn(false);
+    });
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Router>
       <Routes>
-        {/* Login Route */}
-        <Route 
-          path="/" 
-          element={<Login onLoginSuccess={handleLoginSuccess} />} 
-        />
-
-        {/* Chemical Inventory Route - Redirect if not logged in */}
-        <Route 
-          path="/chemicalinventory" 
+        <Route
+          path="/"
           element={
-            isLoggedIn ? <ChemicalInventory /> : <Navigate to="/" />
-          } 
+            isLoggedIn ? (
+              <Navigate to="/chemicalinventory" />
+            ) : (
+              <Login />
+            )
+          }
         />
 
-        {/* Catch-all route to redirect to login */}
+        <Route
+          path="/chemicalinventory"
+          element={
+            isLoggedIn ? (
+              <ChemicalInventory onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        <Route
+          path="/export-csv"
+          element={
+            isLoggedIn ? <CSVFile /> : <Navigate to="/" />
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
@@ -38,3 +73,4 @@ const App = () => {
 };
 
 export default App;
+
