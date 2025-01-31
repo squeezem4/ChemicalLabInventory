@@ -6,6 +6,7 @@
     "@capacitor/android": "^7.0.1",
     "@capacitor/camera": "^7.0.0",
     "@capacitor/core": "^7.0.1",
+    "@capacitor/device": "^7.0.0",
     "@capacitor/ios": "^7.0.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
