@@ -1,3 +1,4 @@
+import image from "../FirstLogo.png";
 import React, { useState, useEffect } from "react";
 import {
   TextField,
@@ -137,7 +138,8 @@ const ChemicalInventory = () => {
 
   return (
     <div className="container">
-      <h1 className="header">Chemical Inventory</h1>
+     <center><img src={image} alt="First Logo" style={{width:350, height:200}}/></center>
+      <h1 className="header">FIRST Chemical Inventory</h1>
 
       <div className="form-container">
         {fieldOrder.map((key) => (
@@ -148,6 +150,7 @@ const ChemicalInventory = () => {
             value={newItem[key]}
             onChange={handleInputChange}
             className="input"
+            required={true}
           />
         ))}
         <Button variant="contained" onClick={addItem} className="button">
