@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@capacitor-community/image-to-text": "^6.0.1",
     "@capacitor/android": "^7.0.1",
     "@capacitor/barcode-scanner": "^2.0.0",
     "@capacitor/camera": "^7.0.0",
