@@ -34,36 +34,28 @@ const App = () => {
     return <div>Loading...</div>;
   }
 
+  
   return (
     <Router>
       <Routes>
         <Route
           path="/"
-          element={
-            isLoggedIn ? (
-              <Navigate to="/chemicalinventory" />
-            ) : (
-              <Login />
-            )
-          }
+          element={<Navigate to={isLoggedIn ? "/chemicalinventory" : "/login"} />}
+        />
+
+        <Route
+          path="/login"
+          element={!isLoggedIn ? <Login onLoginSuccess={() => setIsLoggedIn(true)} /> : <Navigate to="/chemicalinventory" />}
         />
 
         <Route
           path="/chemicalinventory"
-          element={
-            isLoggedIn ? (
-              <ChemicalInventory onLogout={handleLogout} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={isLoggedIn ? <ChemicalInventory onLogout={handleLogout} /> : <Navigate to="/login" />}
         />
 
         <Route
           path="/export-csv"
-          element={
-            isLoggedIn ? <CSVFile /> : <Navigate to="/" />
-          }
+          element={isLoggedIn ? <CSVFile /> : <Navigate to="/login" />}
         />
 
         <Route path="*" element={<Navigate to="/" />} />
