@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import ImageTextScanner from './mobile';  
+import AppState from "../AppState";
+
 import {
   TextField,
   Button,
@@ -36,6 +39,7 @@ const fieldOrder = [
   "numcontainer",
   "sds",
 ];
+
 const ChemicalInventory = () => {
 
   // Define default item structure
@@ -140,7 +144,7 @@ const ChemicalInventory = () => {
       <h1 className="header">Chemical Inventory</h1>
 
       <div className="form-container">
-        {fieldOrder.map((key) => (
+        {!AppState.isMobile && fieldOrder.map((key) => (
           <TextField
             key={key}
             label={key.charAt(0).toUpperCase() + key.slice(1)}
@@ -153,6 +157,7 @@ const ChemicalInventory = () => {
         <Button variant="contained" onClick={addItem} className="button">
           Add Item
         </Button>
+        <ImageTextScanner/>
         <Button
           variant="contained"
           href="/export-csv"

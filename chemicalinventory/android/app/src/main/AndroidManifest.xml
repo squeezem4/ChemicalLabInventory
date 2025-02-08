@@ -45,6 +45,10 @@
             </intent-filter>
             <meta-data android:name="photopicker_activity:0:required" android:value="" />
         </service>
+
+        <meta-data
+          android:name="com.google.mlkit.vision.DEPENDENCIES"
+          android:value="ocr" />
     </application>
 
     <!-- Permissions -->
