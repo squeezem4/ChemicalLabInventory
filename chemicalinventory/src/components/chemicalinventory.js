@@ -49,7 +49,7 @@ const ChemicalInventory = () => {
   const [editItem, setEditItem] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // listener for Firestore updates such as adding and editing chemical fields
+  // Listener for Firestore updates such as adding and editing chemical fields
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "chemicals"), (snapshot) => {
       const items = snapshot.docs.map((doc) => {
