@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -14,235 +14,207 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
+import { db } from "../firebaseConfig.js";
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  doc,
+  onSnapshot,
+} from "firebase/firestore";
 import "../App.css";
 
-// Mock Firestore with a 2-second delay
-const mockFirestore = (() => {
-  let data = [];
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  return {
-    async addDoc(collection, doc) {
-      await delay(2000);
-      const id = data.length;
-      const newDoc = { id, ...doc };
-      data.push(newDoc);
-      return newDoc;
-    },
-    async deleteDoc(collection, id) {
-      await delay(2000);
-      data = data.filter((doc) => doc.id !== id);
-      return true;
-    },
-    async getDocs(collection) {
-      await delay(2000);
-      return [...data];
-    },
-    async updateDoc(collection, id, updatedDoc) {
-      await delay(2000);
-      data = data.map((doc) => (doc.id === id ? { ...doc, ...updatedDoc } : doc));
-      return { id, ...updatedDoc };
-    },
-  };
-})();
-
-// Custom hook for interacting with mock Firestore
-const useMockFirestore = (collection) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    const docs = await mockFirestore.getDocs(collection);
-    setData(docs);
-    setLoading(false);
-  }, [collection]);
-
-  const addItem = async (item) => {
-    setLoading(true);
-    const newDoc = await mockFirestore.addDoc(collection, item);
-    setData((prev) => [...prev, newDoc]);
-    setLoading(false);
-  };
-
-  const deleteItem = async (id) => {
-    setLoading(true);
-    await mockFirestore.deleteDoc(collection, id);
-    setData((prev) => prev.filter((doc) => doc.id !== id));
-    setLoading(false);
-  };
-
-  const updateItem = async (id, updatedItem) => {
-    setLoading(true);
-    const updatedDoc = await mockFirestore.updateDoc(collection, id, updatedItem);
-    setData((prev) =>
-      prev.map((doc) => (doc.id === id ? { ...doc, ...updatedDoc } : doc))
-    );
-    setLoading(false);
-  };
-
-  return {
-    data,
-    loading,
-    fetchData,
-    addItem,
-    deleteItem,
-    updateItem,
-  };
-};
-
-// Main Component
+//structure the order of the fields for firebase
+const fieldOrder = [
+  "name",
+  "quantity",
+  "location",
+  "casnumber",
+  "manufacturer",
+  "weight",
+  "numcontainer",
+  "sds",
+];
 const ChemicalInventory = () => {
-  const { data: inventory, loading, fetchData, addItem, deleteItem, updateItem } =
-    useMockFirestore("inventory");
 
-  const [newItem, setNewItem] = useState({
-    name: "",
-    quantity: "",
-    location: "",
-    casnumber: "",
-    manufacturer: "",
-    weight: "",
-    numcontainer: "",
-    sds: "",
-  });
+  // Define default item structure
+  const defaultItem = fieldOrder.reduce((obj, key) => {
+    obj[key] = "";
+    return obj;
+  }, {});
 
+  const [inventory, setInventory] = useState([]);
+  const [newItem, setNewItem] = useState(defaultItem);
   const [editItem, setEditItem] = useState(null);
-  const [editIndex, setEditIndex] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch data on component mount
+  // listener for Firestore updates such as adding and editing chemical fields
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const unsubscribe = onSnapshot(collection(db, "chemicals"), (snapshot) => {
+      const items = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        const orderedData = fieldOrder.reduce((obj, key) => {
+          obj[key] = data[key] || "";
+          return obj;
+        }, {});
+        return { id: doc.id, ...orderedData };
+      });
+      setInventory(items);
+    });
 
-  const handleInputChange = (e, setItem) => {
+    return () => unsubscribe();
+  }, []);
+
+
+  // Handles input change for the new item form by updating the state
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setItem((prev) => ({ ...prev, [name]: value }));
+    setNewItem({ ...newItem, [name]: value });
   };
 
-  const handleAddItem = () => {
-    if (newItem.name && newItem.quantity && newItem.location) {
-      addItem(newItem);
-      setNewItem({
-        name: "",
-        quantity: "",
-        location: "",
-        casnumber: "",
-        manufacturer: "",
-        weight: "",
-        numcontainer: "",
-        sds: "",
-      });
+  // Handles input change for the edit item form by updating the state
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditItem({ ...editItem, [name]: value });
+  };
+
+  // Adds a new document to the chemicals collection if all fields are filled out
+  const addItem = async () => {
+    const sanitizedItem = fieldOrder.reduce((obj, key) => {
+      obj[key] = newItem[key] || ""; // Ensure all fields are included
+      return obj;
+    }, {});
+
+    if (sanitizedItem.name && sanitizedItem.quantity && sanitizedItem.location) {
+      try {
+        await addDoc(collection(db, "chemicals"), sanitizedItem);
+        setNewItem(defaultItem);
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    } else {
+      alert("Please fill in all required fields.");
     }
   };
 
-  const handleDeleteItem = (id) => {
-    deleteItem(id);
+  // Deletes a document by its ID in the chemicals collection
+  const deleteItem = async (id) => {
+    try {
+      await deleteDoc(doc(db, "chemicals", id)); // Delete document by ID
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
   };
 
-  const handleEditItem = (item, index) => {
+  // Opens the edit modal and populates the form with the entry's data
+  const openEditModal = (item) => {
     setEditItem(item);
-    setEditIndex(index);
     setIsEditing(true);
   };
 
-  const handleSaveEdit = () => {
-    updateItem(editIndex, editItem);
-    handleCloseEditModal();
+  // Updates a document in the chemicals collection with the data from the edit form
+  const saveEdit = async () => {
+    const sanitizedEditItem = fieldOrder.reduce((obj, key) => {
+      obj[key] = editItem[key] || "";
+      return obj;
+    }, {});
+
+    try {
+      const itemRef = doc(db, "chemicals", editItem.id);
+      await updateDoc(itemRef, sanitizedEditItem);
+      closeEditModal();
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    }
   };
 
-  const handleCloseEditModal = () => {
+  // Closes the edit modal
+  const closeEditModal = () => {
     setIsEditing(false);
     setEditItem(null);
-    setEditIndex(null);
   };
 
   return (
     <div className="container">
       <h1 className="header">Chemical Inventory</h1>
+
       <div className="form-container">
-        {Object.keys(newItem).map((key) => (
+        {fieldOrder.map((key) => (
           <TextField
             key={key}
             label={key.charAt(0).toUpperCase() + key.slice(1)}
             name={key}
             value={newItem[key]}
-            onChange={(e) => handleInputChange(e, setNewItem)}
+            onChange={handleInputChange}
             className="input"
-            fullWidth
-            margin="dense"
           />
         ))}
+        <Button variant="contained" onClick={addItem} className="button">
+          Add Item
+        </Button>
         <Button
           variant="contained"
-          onClick={handleAddItem}
+          href="/export-csv"
           className="button"
-          disabled={loading}
         >
-          Add Item
+          Export
         </Button>
       </div>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <TableContainer component={Paper} className="table-container">
-          <Table>
-            <TableHead>
-              <TableRow>
-                {Object.keys(newItem).map((key) => (
-                  <TableCell key={key}>
-                    <strong>{key}</strong>
-                  </TableCell>
+      <TableContainer component={Paper} className="table-container">
+        <Table>
+          <TableHead>
+            <TableRow>
+              {fieldOrder.map((key) => (
+                <TableCell key={key}>
+                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}</strong>
+                </TableCell>
+              ))}
+              <TableCell>
+                <strong>Actions</strong>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {inventory.map((item) => (
+              <TableRow key={item.id}>
+                {fieldOrder.map((key) => (
+                  <TableCell key={key}>{item[key]}</TableCell>
                 ))}
                 <TableCell>
-                  <strong>Actions</strong>
+                  <Button
+                    variant="text"
+                    color="primary"
+                    onClick={() => openEditModal(item)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="text"
+                    color="secondary"
+                    onClick={() => deleteItem(item.id)}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {inventory.map((item) => (
-                <TableRow key={item.id}>
-                  {Object.values(item).map((value, i) => (
-                    <TableCell key={i}>{value}</TableCell>
-                  ))}
-                  <TableCell>
-                    <Button
-                      variant="text"
-                      color="primary"
-                      onClick={() => handleEditItem(item, item.id)}
-                      disabled={loading}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="text"
-                      color="secondary"
-                      onClick={() => handleDeleteItem(item.id)}
-                      disabled={loading}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      <Dialog open={isEditing} onClose={handleCloseEditModal}>
+      <Dialog open={isEditing} onClose={closeEditModal}>
         <DialogTitle>Edit Chemical</DialogTitle>
         <DialogContent>
           {editItem &&
-            Object.keys(editItem).map((key) => (
+            fieldOrder.map((key) => (
               <TextField
                 key={key}
                 label={key.charAt(0).toUpperCase() + key.slice(1)}
                 name={key}
-                value={editItem[key]}
-                onChange={(e) => handleInputChange(e, setEditItem)}
+                value={editItem[key] || ""}
+                onChange={handleEditChange}
                 className="input"
                 fullWidth
                 margin="dense"
@@ -250,10 +222,10 @@ const ChemicalInventory = () => {
             ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseEditModal} color="secondary">
+          <Button onClick={closeEditModal} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleSaveEdit} color="primary" disabled={loading}>
+          <Button onClick={saveEdit} color="primary">
             Save
           </Button>
         </DialogActions>
@@ -267,3 +239,4 @@ const ChemicalInventory = () => {
 };
 
 export default ChemicalInventory;
+
