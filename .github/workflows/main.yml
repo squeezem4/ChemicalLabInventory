@@ -29,8 +29,10 @@ jobs:
           cd chemicalinventory
           npm install
 
-     # - name: Run tests
-      #  run: npm test -- --watchAll=false
+      - name: Run tests
+        run: |
+         cd chemicalinventory
+         npm test
 
       - name: Build the application
         run: |
