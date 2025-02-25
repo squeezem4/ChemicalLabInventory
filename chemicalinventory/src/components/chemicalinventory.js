@@ -1,3 +1,4 @@
+import image from "../FirstLogo.png";
 import React, { useState, useEffect } from "react";
 import {
   TextField,
@@ -23,9 +24,10 @@ import {
   doc,
   onSnapshot,
 } from "firebase/firestore";
+import { getAuth, signOut } from "firebase/auth";
 import "../App.css";
 
-//structure the order of the fields for firebase
+// Structure the order of the fields for firebase
 const fieldOrder = [
   "name",
   "quantity",
@@ -37,6 +39,7 @@ const fieldOrder = [
   "sds",
 ];
 const ChemicalInventory = () => {
+  const auth = getAuth();
 
   // Define default item structure
   const defaultItem = fieldOrder.reduce((obj, key) => {
@@ -65,7 +68,6 @@ const ChemicalInventory = () => {
 
     return () => unsubscribe();
   }, []);
-
 
   // Handles input change for the new item form by updating the state
   const handleInputChange = (e) => {
@@ -135,9 +137,14 @@ const ChemicalInventory = () => {
     setEditItem(null);
   };
 
+  const handleLogout = () => {
+    signOut(auth)
+  };
+
   return (
     <div className="container">
-      <h1 className="header">Chemical Inventory</h1>
+     <center><img src={image} alt="First Logo" style={{width:350, height:200}}/></center>
+      <h1 className="header">FIRST Chemical Inventory</h1>
 
       <div className="form-container">
         {fieldOrder.map((key) => (
@@ -148,6 +155,7 @@ const ChemicalInventory = () => {
             value={newItem[key]}
             onChange={handleInputChange}
             className="input"
+            required={true}
           />
         ))}
         <Button variant="contained" onClick={addItem} className="button">
@@ -159,6 +167,14 @@ const ChemicalInventory = () => {
           className="button"
         >
           Export
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleLogout}
+          className="button"
+        >
+          Logout
         </Button>
       </div>
 
@@ -239,4 +255,3 @@ const ChemicalInventory = () => {
 };
 
 export default ChemicalInventory;
-
