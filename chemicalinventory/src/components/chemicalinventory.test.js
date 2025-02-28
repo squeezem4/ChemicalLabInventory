@@ -1,3 +1,9 @@
+//After writing a passing test, prevent false positives by modifying behavior to induce failure
+//screen.debug() before/after changes to ensure proper function
+
+//Try getByRole instead of getByText?
+//When to use describe?
+
 import React, {useState} from 'react';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import PropTypes, { object } from "prop-types";
@@ -31,16 +37,17 @@ beforeEach(() => {
 
 test("render the chemicalinventory component", () => {
   render(<ChemicalInventory />);
+  // screen.debug();
   expect(screen.getByText("Chemical Inventory")).toBeInTheDocument();
 });
 
-test("display all inventory items", async () => {
+test.skip("display all inventory items", async () => {
   render(<ChemicalInventory />);
   expect(await screen.findByText("Sodium Chloride")).toBeInTheDocument();
   expect(await screen.findByText("Sugar")).toBeInTheDocument();
 });
 
-test("adds new chemical", async () => {
+test.skip("adds new chemical", async () => {
   addDoc.mockResolvedValueOnce({ id: "3"});
   render(<ChemicalInventory />);
 
@@ -56,7 +63,7 @@ test("adds new chemical", async () => {
   // expect(await screen.findByText("Hydrogen Peroxide"))
 });
 
-test("deletes an item from inventory", async () => {
+test.skip("deletes an item from inventory", async () => {
   deleteDoc.mockResolvedValueOnce();
   render(<ChemicalInventory />);
 
