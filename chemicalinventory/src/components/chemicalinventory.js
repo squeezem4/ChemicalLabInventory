@@ -231,9 +231,9 @@ const ChemicalInventory = () => {
         </DialogActions>
       </Dialog>
 
-      <p>
-        <center>Created by Code 007</center>
-      </p>
+      <footer>
+        <p>Created by Code 007</p>
+      </footer>
     </div>
   );
 };
