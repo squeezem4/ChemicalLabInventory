@@ -55,6 +55,7 @@ const ChemicalInventory = () => {
   const [newItem, setNewItem] = useState(defaultItem);
   const [editItem, setEditItem] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isAddItemOpen, setIsAddItemOpen] = useState(false);  // New state for showing the form in mobile
 
   // Listener for Firestore updates such as adding and editing chemical fields
   useEffect(() => {
@@ -145,13 +146,19 @@ const ChemicalInventory = () => {
     signOut(auth)
   };
 
+  // Toggle the Add Item form visibility in mobile view
+  const toggleAddItemForm = () => {
+    setIsAddItemOpen(!isAddItemOpen);
+  };
+
   return (
     <div className="container">
-     <center><img src={image} alt="First Logo" style={{width:350, height:200}}/></center>
+      <center><img src={image} alt="First Logo" style={{width:350, height:200}}/></center>
       <h1 className="header">FIRST Chemical Inventory</h1>
 
       <div className="form-container">
-        {!AppState.isMobile && fieldOrder.map((key) => (
+        {/* Conditionally render fields based on isAddItemOpen in mobile view */}
+        {(!AppState.isMobile || isAddItemOpen) && fieldOrder.map((key) => (
           <TextField
             key={key}
             label={key.charAt(0).toUpperCase() + key.slice(1)}
@@ -162,10 +169,22 @@ const ChemicalInventory = () => {
             required={true}
           />
         ))}
-        <Button variant="contained" onClick={addItem} className="button">
-          Add Item
-        </Button>
-        <ImageTextScanner/>
+        
+        {/* Show Add Item button that toggles the visibility of input fields */}
+        {AppState.isMobile && (
+          <Button variant="contained" onClick={toggleAddItemForm} className="button">
+            {isAddItemOpen ? "Hide Form" : "Add Item"}
+          </Button>
+        )}
+
+        {/* Keep the Add Item button for desktop view */}
+        {!AppState.isMobile && (
+          <Button variant="contained" onClick={addItem} className="button">
+            Add Item
+          </Button>
+        )}
+
+        <ImageTextScanner setNewItem={setNewItem}/> {/* Pass down setNewItem */}
         <Button
           variant="contained"
           href="/export-csv"
