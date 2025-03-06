@@ -261,6 +261,35 @@ const ChemicalInventory = () => {
         </Table>
       </TableContainer>
 
+
+      <Dialog open={isEditing} onClose={closeEditModal}>
+        <DialogTitle>Edit Chemical</DialogTitle>
+        <DialogContent>
+          {editItem &&
+            fieldOrder.map((key) => (
+              <TextField
+                key={key}
+                label={key.charAt(0).toUpperCase() + key.slice(1)}
+                name={key}
+                value={editItem[key] || ""}
+                onChange={handleEditChange}
+                className="input"
+                fullWidth
+                margin="dense"
+              />
+            ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeEditModal} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={saveEdit} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
       <Dialog open={isAddItemOpen} onClose={() => setIsAddItemOpen(false)}>
         <DialogTitle>Add New Chemical</DialogTitle>
         <DialogContent>
