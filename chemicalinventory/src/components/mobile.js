@@ -2,9 +2,8 @@ import React, { useState, useRef } from "react";
 import { Camera, CameraResultType, CameraSource, CameraDirection } from '@capacitor/camera';
 import { Ocr } from '@capacitor-community/image-to-text';
 import { Button, TextField, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-import AppState from "../AppState";
 
-const ImageTextScanner = () => {
+const ImageTextScanner = ({ setNewItem, addItem, onScanComplete, setIsAddItemOpen }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -98,16 +97,27 @@ const ImageTextScanner = () => {
 
   // Handle adding the item (with CAS number and selected name)
   const handleAddItem = () => {
-    if (casNumber && selectedName) {
-      // Add the item to your app's state or database
-      console.log("Adding item:", { casNumber, selectedName });
+    console.log("Adding item:", { casNumber, selectedName }); // Debugging
 
-      // For demonstration, we just log the item. Replace this with your own logic
-      alert(`Item added with CAS Number: ${casNumber} and Name: ${selectedName}`);
+    if (casNumber && selectedName) {
+      const item = { casnumber: casNumber, name: selectedName };
+  
+      // Call the setNewItem from parent to add the item
+      setNewItem(item);  // This sets the scanned item in the parent component's state
+  
+      // Now call the addItem function from the parent to add the item to the inventory
+      //addItem();
+
+      setIsAddItemOpen(true);
+  
+      // Show confirmation or alert
+      //alert(`Item added with CAS Number: ${casNumber} and Name: ${selectedName}`);
     } else {
       alert("Please scan an item and select or edit a name first.");
     }
   };
+  
+
 
   return (
     <div>

@@ -97,6 +97,7 @@ const ChemicalInventory = () => {
       try {
         await addDoc(collection(db, "chemicals"), sanitizedItem);
         setNewItem(defaultItem);
+        setIsAddItemOpen(false);  // Close the modal after adding
       } catch (error) {
         console.error("Error adding document: ", error);
       }
@@ -143,7 +144,7 @@ const ChemicalInventory = () => {
   };
 
   const handleLogout = () => {
-    signOut(auth)
+    signOut(auth);
   };
 
   // Toggle the Add Item form visibility in mobile view
@@ -151,9 +152,19 @@ const ChemicalInventory = () => {
     setIsAddItemOpen(!isAddItemOpen);
   };
 
+  // Handle scan completion and trigger modal to add item
+  const handleScanComplete = (scannedData) => {
+    setNewItem({
+      ...newItem,
+      name: scannedData.name,
+      casnumber: scannedData.casnumber, 
+    });
+    setIsAddItemOpen(true);  // Open the modal after setting the scanned data
+  };
+
   return (
     <div className="container">
-      <center><img src={image} alt="First Logo" style={{width:350, height:200}}/></center>
+      <center><img src={image} alt="First Logo" style={{ width: 350, height: 200 }} /></center>
       <h1 className="header">FIRST Chemical Inventory</h1>
 
       <div className="form-container">
@@ -163,13 +174,13 @@ const ChemicalInventory = () => {
             key={key}
             label={key.charAt(0).toUpperCase() + key.slice(1)}
             name={key}
-            value={newItem[key]}
+            value={newItem[key]}  // Pre-fill the values here
             onChange={handleInputChange}
             className="input"
             required={true}
           />
         ))}
-        
+
         {/* Show Add Item button that toggles the visibility of input fields */}
         {AppState.isMobile && (
           <Button variant="contained" onClick={toggleAddItemForm} className="button">
@@ -184,7 +195,13 @@ const ChemicalInventory = () => {
           </Button>
         )}
 
-        <ImageTextScanner setNewItem={setNewItem}/> {/* Pass down setNewItem */}
+        <ImageTextScanner
+          setNewItem={setNewItem}        // Pass the setNewItem function
+          addItem={addItem}              // Pass the addItem function
+          onScanComplete={handleScanComplete}
+          setIsAddItemOpen={setIsAddItemOpen}
+        />
+
         <Button
           variant="contained"
           href="/export-csv"
@@ -244,29 +261,29 @@ const ChemicalInventory = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={isEditing} onClose={closeEditModal}>
-        <DialogTitle>Edit Chemical</DialogTitle>
+      <Dialog open={isAddItemOpen} onClose={() => setIsAddItemOpen(false)}>
+        <DialogTitle>Add New Chemical</DialogTitle>
         <DialogContent>
-          {editItem &&
-            fieldOrder.map((key) => (
-              <TextField
-                key={key}
-                label={key.charAt(0).toUpperCase() + key.slice(1)}
-                name={key}
-                value={editItem[key] || ""}
-                onChange={handleEditChange}
-                className="input"
-                fullWidth
-                margin="dense"
-              />
-            ))}
+          {fieldOrder.map((key) => (
+            <TextField
+              key={key}
+              label={key.charAt(0).toUpperCase() + key.slice(1)}
+              name={key}
+              value={newItem[key]}  // Pre-fill the values here
+              onChange={handleInputChange}
+              className="input"
+              required={key === "name" || key === "casnumber"}  // Make name and CAS required
+              fullWidth
+              margin="dense"
+            />
+          ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeEditModal} color="secondary">
+          <Button onClick={() => setIsAddItemOpen(false)} color="secondary">
             Cancel
           </Button>
-          <Button onClick={saveEdit} color="primary">
-            Save
+          <Button onClick={addItem} color="primary">
+            Add Item
           </Button>
         </DialogActions>
       </Dialog>
