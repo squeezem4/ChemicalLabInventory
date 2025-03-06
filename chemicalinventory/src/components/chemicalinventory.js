@@ -1,5 +1,8 @@
 import image from "../FirstLogo.png";
 import React, { useState, useEffect } from "react";
+import ImageTextScanner from './mobile';  
+import AppState from "../AppState";
+
 import {
   TextField,
   Button,
@@ -38,6 +41,7 @@ const fieldOrder = [
   "numcontainer",
   "sds",
 ];
+
 const ChemicalInventory = () => {
   const auth = getAuth();
 
@@ -51,6 +55,7 @@ const ChemicalInventory = () => {
   const [newItem, setNewItem] = useState(defaultItem);
   const [editItem, setEditItem] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isAddItemOpen, setIsAddItemOpen] = useState(false);  // New state for showing the form in mobile
 
   // Listener for Firestore updates such as adding and editing chemical fields
   useEffect(() => {
@@ -92,6 +97,7 @@ const ChemicalInventory = () => {
       try {
         await addDoc(collection(db, "chemicals"), sanitizedItem);
         setNewItem(defaultItem);
+        setIsAddItemOpen(false);  // Close the modal after adding
       } catch (error) {
         console.error("Error adding document: ", error);
       }
@@ -138,29 +144,64 @@ const ChemicalInventory = () => {
   };
 
   const handleLogout = () => {
-    signOut(auth)
+    signOut(auth);
+  };
+
+  // Toggle the Add Item form visibility in mobile view
+  const toggleAddItemForm = () => {
+    setIsAddItemOpen(!isAddItemOpen);
+  };
+
+  // Handle scan completion and trigger modal to add item
+  const handleScanComplete = (scannedData) => {
+    setNewItem({
+      ...newItem,
+      name: scannedData.name,
+      casnumber: scannedData.casnumber, 
+    });
+    setIsAddItemOpen(true);  // Open the modal after setting the scanned data
   };
 
   return (
     <div className="container">
-     <center><img src={image} alt="First Logo" style={{width:350, height:200}}/></center>
+      <center><img src={image} alt="First Logo" style={{ width: 350, height: 200 }} /></center>
       <h1 className="header">FIRST Chemical Inventory</h1>
 
       <div className="form-container">
-        {fieldOrder.map((key) => (
+        {/* Conditionally render fields based on isAddItemOpen in mobile view */}
+        {(!AppState.isMobile || isAddItemOpen) && fieldOrder.map((key) => (
           <TextField
             key={key}
             label={key.charAt(0).toUpperCase() + key.slice(1)}
             name={key}
-            value={newItem[key]}
+            value={newItem[key]}  // Pre-fill the values here
             onChange={handleInputChange}
             className="input"
             required={true}
           />
         ))}
-        <Button variant="contained" onClick={addItem} className="button">
-          Add Item
-        </Button>
+
+        {/* Show Add Item button that toggles the visibility of input fields */}
+        {AppState.isMobile && (
+          <Button variant="contained" onClick={toggleAddItemForm} className="button">
+            {isAddItemOpen ? "Hide Form" : "Add Item"}
+          </Button>
+        )}
+
+        {/* Keep the Add Item button for desktop view */}
+        {!AppState.isMobile && (
+          <Button variant="contained" onClick={addItem} className="button">
+            Add Item
+          </Button>
+        )}
+
+        <ImageTextScanner
+          setNewItem={setNewItem}        // Pass the setNewItem function
+          addItem={addItem}              // Pass the addItem function
+          onScanComplete={handleScanComplete}
+          setIsAddItemOpen={setIsAddItemOpen}
+        />
+
         <Button
           variant="contained"
           href="/export-csv"
@@ -220,6 +261,7 @@ const ChemicalInventory = () => {
         </Table>
       </TableContainer>
 
+
       <Dialog open={isEditing} onClose={closeEditModal}>
         <DialogTitle>Edit Chemical</DialogTitle>
         <DialogContent>
@@ -243,6 +285,34 @@ const ChemicalInventory = () => {
           </Button>
           <Button onClick={saveEdit} color="primary">
             Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
+      <Dialog open={isAddItemOpen} onClose={() => setIsAddItemOpen(false)}>
+        <DialogTitle>Add New Chemical</DialogTitle>
+        <DialogContent>
+          {fieldOrder.map((key) => (
+            <TextField
+              key={key}
+              label={key.charAt(0).toUpperCase() + key.slice(1)}
+              name={key}
+              value={newItem[key]}  // Pre-fill the values here
+              onChange={handleInputChange}
+              className="input"
+              required={key === "name" || key === "casnumber"}  // Make name and CAS required
+              fullWidth
+              margin="dense"
+            />
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsAddItemOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={addItem} color="primary">
+            Add Item
           </Button>
         </DialogActions>
       </Dialog>
