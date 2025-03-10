@@ -1,6 +1,4 @@
-// src/components/Login.js
 import React, { useState } from "react";
-// eslint-disable-next-line
 import { signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { useNavigate } from "react-router-dom";
@@ -13,13 +11,14 @@ const Login = ({ onLoginSuccess }) => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
+  // handle login
   const handleLogin = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
       if (user  && !user.emailVerified) {
-        // await sendEmailVerification(user); //dont forget to delete this line after dev
+        await sendEmailVerification(user);
         setMessage('Login failed: Email not verified');
         return;
       }
