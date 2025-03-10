@@ -10,7 +10,8 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   const auth = getAuth();
-
+  
+  // Listen for changes in the authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -20,10 +21,10 @@ const App = () => {
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, [auth]);
 
+  // handle logout
   const handleLogout = () => {
     signOut(auth).then(() => {
       setIsLoggedIn(false);
@@ -34,7 +35,7 @@ const App = () => {
     return <div>Loading...</div>;
   }
 
-  
+  // Return the router with all the routes
   return (
     <Router>
       <Routes>

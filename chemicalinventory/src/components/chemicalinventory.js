@@ -1,3 +1,4 @@
+// import dependencies and components
 import image from "../FirstLogo.png";
 import React, { useState, useEffect } from "react";
 import ImageTextScanner from './mobile';  
@@ -56,7 +57,7 @@ const ChemicalInventory = () => {
   const [editItem, setEditItem] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);  // New state for showing the form in mobile
-
+  
   // Listener for Firestore updates such as adding and editing chemical fields
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "chemicals"), (snapshot) => {
@@ -97,7 +98,7 @@ const ChemicalInventory = () => {
       try {
         await addDoc(collection(db, "chemicals"), sanitizedItem);
         setNewItem(defaultItem);
-        setIsAddItemOpen(false);  // Close the modal after adding
+        setIsAddItemOpen(false);
       } catch (error) {
         console.error("Error adding document: ", error);
       }
@@ -143,23 +144,24 @@ const ChemicalInventory = () => {
     setEditItem(null);
   };
 
+  // handles logout
   const handleLogout = () => {
     signOut(auth);
   };
 
-  // Toggle the Add Item form visibility in mobile view
+  // toggle the Add Item form visibility in mobile view
   const toggleAddItemForm = () => {
     setIsAddItemOpen(!isAddItemOpen);
   };
 
-  // Handle scan completion and trigger modal to add item
+  // handle scan completion and trigger modal to add item
   const handleScanComplete = (scannedData) => {
     setNewItem({
       ...newItem,
       name: scannedData.name,
       casnumber: scannedData.casnumber, 
     });
-    setIsAddItemOpen(true);  // Open the modal after setting the scanned data
+    setIsAddItemOpen(true);
   };
 
   return (
@@ -325,3 +327,4 @@ const ChemicalInventory = () => {
 };
 
 export default ChemicalInventory;
+

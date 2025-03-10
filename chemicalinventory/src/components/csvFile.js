@@ -18,6 +18,7 @@ const fieldOrder = [
 const CSVFile = () => {
   const [csvData, setCSVData] = useState([]);
 
+  //get data from db
   useEffect(() => {
     const getCSVData = async () => {
       const querySnapshot = await getDocs(collection(db, "chemicals"));
@@ -75,3 +76,4 @@ const CSVFile = () => {
 };
 
 export default CSVFile;
+
