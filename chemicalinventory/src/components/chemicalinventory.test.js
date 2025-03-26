@@ -41,13 +41,13 @@ test("render the chemicalinventory component", () => {
   expect(screen.getByText("Chemical Inventory")).toBeInTheDocument();
 });
 
-test.skip("display all inventory items", async () => {
+test("display all inventory items", async () => {
   render(<ChemicalInventory />);
   expect(await screen.findByText("Sodium Chloride")).toBeInTheDocument();
   expect(await screen.findByText("Sugar")).toBeInTheDocument();
 });
 
-test.skip("adds new chemical", async () => {
+test("adds new chemical", async () => {
   addDoc.mockResolvedValueOnce({ id: "3"});
   render(<ChemicalInventory />);
 
@@ -63,7 +63,7 @@ test.skip("adds new chemical", async () => {
   // expect(await screen.findByText("Hydrogen Peroxide"))
 });
 
-test.skip("deletes an item from inventory", async () => {
+test("deletes an item from inventory", async () => {
   deleteDoc.mockResolvedValueOnce();
   render(<ChemicalInventory />);
 
