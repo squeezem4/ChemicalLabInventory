@@ -3,13 +3,13 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from "react-router-dom";
 import Login from './login';
 
-test.skip("renders login form correctly", () => {
+test("renders login form correctly", () => {
 
   const mockOnLoginSuccess = jest.fn();
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  // beforeEach(() => {
+  //   jest.clearAllMocks();
+  // });
 
   render(
     <Router>

@@ -1,3 +1,9 @@
+//After writing a passing test, prevent false positives by modifying behavior to induce failure
+//screen.debug() before/after changes to ensure proper function
+
+//Try getByRole instead of getByText?
+//When to use describe?
+
 import React, {useState} from 'react';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import PropTypes, { object } from "prop-types";
@@ -31,6 +37,7 @@ beforeEach(() => {
 
 test("render the chemicalinventory component", () => {
   render(<ChemicalInventory />);
+  // screen.debug();
   expect(screen.getByText("Chemical Inventory")).toBeInTheDocument();
 });
 

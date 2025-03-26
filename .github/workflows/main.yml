@@ -24,13 +24,16 @@ jobs:
         with:
           node-version: 16
 
+      # replace npm install with 'npm ci' for clean install?
       - name: Install dependencies
         run: |
           cd chemicalinventory
           npm install
 
-     # - name: Run tests
-      #  run: npm test -- --watchAll=false
+      - name: Run tests
+        run: |
+          cd chemicalinventory
+          npm test
 
       - name: Build the application
         run: |
