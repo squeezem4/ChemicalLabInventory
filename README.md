@@ -18,9 +18,9 @@ This is a full-stack application for managing a chemical inventory. The applicat
 
 The application uses environment variables for configuration. The following variables are required:
 
-- `FIREBASE_API_KEY`: the Firebase API key
-- `FIREBASE_AUTH_DOMAIN`: the Firebase authentication domain
-- `FIREBASE_PROJECT_ID`: the Firebase project ID
+- `apiKey`: the Firebase API key
+- `authDomain`: the Firebase authentication domain
+- `projectId`: the Firebase project ID
 
 ## Development
 
