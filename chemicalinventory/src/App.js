@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import Login from "./components/login";
 import ChemicalInventory from "./components/chemicalinventory";
@@ -10,7 +15,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   const auth = getAuth();
-  
+
   // Listen for changes in the authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -41,17 +46,31 @@ const App = () => {
       <Routes>
         <Route
           path="/"
-          element={<Navigate to={isLoggedIn ? "/chemicalinventory" : "/login"} />}
+          element={
+            <Navigate to={isLoggedIn ? "/chemicalinventory" : "/login"} />
+          }
         />
 
         <Route
           path="/login"
-          element={!isLoggedIn ? <Login onLoginSuccess={() => setIsLoggedIn(true)} /> : <Navigate to="/chemicalinventory" />}
+          element={
+            !isLoggedIn ? (
+              <Login onLoginSuccess={() => setIsLoggedIn(true)} />
+            ) : (
+              <Navigate to="/chemicalinventory" />
+            )
+          }
         />
 
         <Route
           path="/chemicalinventory"
-          element={isLoggedIn ? <ChemicalInventory onLogout={handleLogout} /> : <Navigate to="/login" />}
+          element={
+            isLoggedIn ? (
+              <ChemicalInventory onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
 
         <Route
@@ -66,4 +85,3 @@ const App = () => {
 };
 
 export default App;
-
