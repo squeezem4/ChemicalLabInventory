@@ -1,7 +1,7 @@
 // import dependencies and components
 import image from "../FirstLogo.png";
 import React, { useState, useEffect } from "react";
-import ImageTextScanner from './mobile';  
+import ImageTextScanner from "./mobile";
 import AppState from "../AppState";
 
 import {
@@ -39,7 +39,7 @@ const fieldOrder = [
   "casnumber",
   "manufacturer",
   "weight",
-  "numcontainer",
+  "containers",
   "sds",
 ];
 
@@ -56,8 +56,8 @@ const ChemicalInventory = () => {
   const [newItem, setNewItem] = useState(defaultItem);
   const [editItem, setEditItem] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isAddItemOpen, setIsAddItemOpen] = useState(false);  // New state for showing the form in mobile
-  
+  const [isAddItemOpen, setIsAddItemOpen] = useState(false); // New state for showing the form in mobile
+
   // Listener for Firestore updates such as adding and editing chemical fields
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "chemicals"), (snapshot) => {
@@ -94,7 +94,11 @@ const ChemicalInventory = () => {
       return obj;
     }, {});
 
-    if (sanitizedItem.name && sanitizedItem.quantity && sanitizedItem.location) {
+    if (
+      sanitizedItem.name &&
+      sanitizedItem.quantity &&
+      sanitizedItem.location
+    ) {
       try {
         await addDoc(collection(db, "chemicals"), sanitizedItem);
         setNewItem(defaultItem);
@@ -159,33 +163,40 @@ const ChemicalInventory = () => {
     setNewItem({
       ...newItem,
       name: scannedData.name,
-      casnumber: scannedData.casnumber, 
+      casnumber: scannedData.casnumber,
     });
     setIsAddItemOpen(true);
   };
 
   return (
     <div className="container">
-      <center><img src={image} alt="First Logo" style={{ width: 350, height: 200 }} /></center>
+      <center>
+        <img src={image} alt="First Logo" style={{ width: 350, height: 200 }} />
+      </center>
       <h1 className="header">FIRST Chemical Inventory</h1>
 
       <div className="form-container">
         {/* Conditionally render fields based on isAddItemOpen in mobile view */}
-        {(!AppState.isMobile || isAddItemOpen) && fieldOrder.map((key) => (
-          <TextField
-            key={key}
-            label={key.charAt(0).toUpperCase() + key.slice(1)}
-            name={key}
-            value={newItem[key]}  // Pre-fill the values here
-            onChange={handleInputChange}
-            className="input"
-            required={true}
-          />
-        ))}
+        {(!AppState.isMobile || isAddItemOpen) &&
+          fieldOrder.map((key) => (
+            <TextField
+              key={key}
+              label={key.charAt(0).toUpperCase() + key.slice(1)}
+              name={key}
+              value={newItem[key]} // Pre-fill the values here
+              onChange={handleInputChange}
+              className="input"
+              required={true}
+            />
+          ))}
 
         {/* Show Add Item button that toggles the visibility of input fields */}
         {AppState.isMobile && (
-          <Button variant="contained" onClick={toggleAddItemForm} className="button">
+          <Button
+            variant="contained"
+            onClick={toggleAddItemForm}
+            className="button"
+          >
             {isAddItemOpen ? "Hide Form" : "Add Item"}
           </Button>
         )}
@@ -198,17 +209,13 @@ const ChemicalInventory = () => {
         )}
 
         <ImageTextScanner
-          setNewItem={setNewItem}        // Pass the setNewItem function
-          addItem={addItem}              // Pass the addItem function
+          setNewItem={setNewItem} // Pass the setNewItem function
+          addItem={addItem} // Pass the addItem function
           onScanComplete={handleScanComplete}
           setIsAddItemOpen={setIsAddItemOpen}
         />
 
-        <Button
-          variant="contained"
-          href="/export-csv"
-          className="button"
-        >
+        <Button variant="contained" href="/export-csv" className="button">
           Export
         </Button>
         <Button
@@ -239,7 +246,19 @@ const ChemicalInventory = () => {
             {inventory.map((item) => (
               <TableRow key={item.id}>
                 {fieldOrder.map((key) => (
-                  <TableCell key={key}>{item[key]}</TableCell>
+                  <TableCell key={key}>
+                    {key === "sds" && item[key] ? (
+                      <a
+                        href={item[key]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {item[key]}
+                      </a>
+                    ) : (
+                      item[key]
+                    )}
+                  </TableCell>
                 ))}
                 <TableCell>
                   <Button
@@ -262,7 +281,6 @@ const ChemicalInventory = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
 
       <Dialog open={isEditing} onClose={closeEditModal}>
         <DialogTitle>Edit Chemical</DialogTitle>
@@ -291,7 +309,6 @@ const ChemicalInventory = () => {
         </DialogActions>
       </Dialog>
 
-
       <Dialog open={isAddItemOpen} onClose={() => setIsAddItemOpen(false)}>
         <DialogTitle>Add New Chemical</DialogTitle>
         <DialogContent>
@@ -300,10 +317,10 @@ const ChemicalInventory = () => {
               key={key}
               label={key.charAt(0).toUpperCase() + key.slice(1)}
               name={key}
-              value={newItem[key]}  // Pre-fill the values here
+              value={newItem[key]} // Pre-fill the values here
               onChange={handleInputChange}
               className="input"
-              required={key === "name" || key === "casnumber"}  // Make name and CAS required
+              required={key === "name" || key === "casnumber"} // Make name and CAS required
               fullWidth
               margin="dense"
             />
@@ -327,4 +344,3 @@ const ChemicalInventory = () => {
 };
 
 export default ChemicalInventory;
-
