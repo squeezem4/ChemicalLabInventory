@@ -1,0 +1,13 @@
+.logo-image {
+    width: 350px;
+    height: auto;
+    display: block;
+    margin: auto;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}  
+
+.container p{
+    text-align: center;
+}

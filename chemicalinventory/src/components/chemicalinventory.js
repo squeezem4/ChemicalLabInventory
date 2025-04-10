@@ -3,6 +3,7 @@ import image from "../FirstLogo.png";
 import React, { useState, useEffect } from "react";
 import ImageTextScanner from './mobile';  
 import AppState from "../AppState";
+import "../chemicalinventory.css";
 
 import {
   TextField,
@@ -166,7 +167,7 @@ const ChemicalInventory = () => {
 
   return (
     <div className="container">
-      <center><img src={image} alt="First Logo" style={{ width: 350, height: 200 }} /></center>
+      <img src={image} alt="First Logo" className="logo-image" />
       <h1 className="header">FIRST Chemical Inventory</h1>
 
       <div className="form-container">
@@ -320,7 +321,7 @@ const ChemicalInventory = () => {
       </Dialog>
 
       <p>
-        <center>Created by Code 007</center>
+        Created by Code 007
       </p>
     </div>
   );
