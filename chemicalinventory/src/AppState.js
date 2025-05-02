@@ -11,17 +11,17 @@ const isMobileBrowser = /Mobi|Android|iPhone/i.test(navigator.userAgent);
 const isMobile = isCapacitorMobile || isMobileBrowser;
 
 
-const AppState = {
-  isMobile,
-  platform,
-};
-
-
-// // AppState.js --- FORCED MOBILE ON ALL PLATFORMS
 // const AppState = {
-//   isMobile: true,
-//   platform: "forced-mobile", // optional, just for clarity/debugging
+//   isMobile,
+//   platform,
 // };
+
+
+// AppState.js --- FORCED MOBILE ON ALL PLATFORMS // FOR TESTING
+const AppState = {
+  isMobile: true,
+  platform: "forced-mobile", // optional, just for clarity/debugging
+};
 
 
 
